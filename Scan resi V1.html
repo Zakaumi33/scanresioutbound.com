@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Scan Resi Kurir - Cozyclub.id</title>
+    <style>
+        /* --- CSS STYLING UTAMA --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e9eff5;
+            margin: 0;
+            padding: 0; 
+            padding-top: 100px; 
+            transition: background-color 0.3s, color 0.3s; 
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            display: flex;
+            gap: 20px;
+        }
+
+        /* --- STICKY HEADER --- */
+        #stickyHeaderContainer {
+            width: 100%;
+            position: sticky;
+            top: 0;
+            left: 0;
+            z-index: 1000; 
+            background-color: #e9eff5; 
+            box-shadow: 0 4px 5px rgba(0, 0, 0, 0.05); 
+        }
+        
+        #stickyHeaderContainer > .container {
+             padding: 0 20px; 
+             max-width: 1200px;
+             width: 100%;
+             margin: auto;
+        }
+
+        #watermark {
+            position: absolute;
+            top: 5px;
+            right: 20px;
+            font-size: 0.8rem;
+            color: #b0b0b0;
+            font-weight: 600;
+            padding: 5px 10px;
+            border-radius: 4px;
+            background-color: rgba(0, 0, 0, 0.05);
+            z-index: 1001;
+        }
+        
+        #mainHeader {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0; 
+            padding-bottom: 10px;
+            border-bottom: 2px solid #007bff;
+            width: 100%;
+            position: relative;
+        }
+
+        #storeName {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #333;
+            text-align: center;
+            width: 100%;
+        }
+
+        #datetimeInfo {
+            text-align: right;
+            margin-top: auto;
+            padding-top: 50px; 
+        }
+
+        #realTimeClock { font-size: 1.8rem; font-weight: bold; color: #333; }
+        #realTimeDate { font-size: 1rem; color: #555; font-weight: 500; }
+
+        /* --- LAYOUT KONTEN --- */
+        .content-container { 
+            max-width: 1200px;
+            margin: 20px auto; 
+            display: flex;
+            gap: 20px;
+            padding: 0 20px; 
+        }
+        
+        .input-area {
+            flex: 2;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        /* --- WIDGET SUMMARY --- */
+        .summary-widget {
+            flex: 1;
+            background-color: #007bff;
+            color: white;
+            padding: 25px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            /* justify-content: flex-start; memastikan konten mulai dari atas */
+            justify-content: flex-start; 
+            gap: 10px; /* Jarak antar elemen di dalam widget */
+        }
+        
+        .summary-widget h3 {
+            font-weight: 700;
+            margin-top: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .total-number {
+            font-size: 5.5rem;
+            font-weight: 800;
+            margin: 5px 0 15px 0; /* Mengurangi margin bawah agar tombol lebih dekat */
+            line-height: 1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .summary-widget button {
+            width: 100%;
+            margin-top: 10px;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .summary-widget button:active { transform: scale(0.98); }
+        
+        #exportBtn { background-color: #ffc107; color: #333; }
+        #exportBtn:hover { background-color: #e0a800; }
+        
+        #importBtn { background-color: #17a2b8; color: white; margin-top: 8px; }
+        #importBtn:hover { background-color: #138496; }
+
+        #importFileInput { display: none; }
+        
+        #resetAllBtn { background-color: #dc3545; color: white; margin-top: 8px; }
+        #resetAllBtn:hover { background-color: #c82333; }
+
+        /* --- STYLE TABEL & INPUT --- */
+        h2 {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-top: 25px;
+        }
+        h2:first-of-type { margin-top: 0; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #eee; padding: 10px; text-align: left; }
+        th { background-color: #f8f9fa; font-weight: 600; }
+        
+        #inputGroup { display: flex; gap: 10px; margin-bottom: 20px; }
+
+        #newResiInput, #cancelResiInput {
+            flex-grow: 1;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1.1rem;
+        }
+        
+        #resiListControl {
+            display: flex;
+            justify-content: space-between;
+            align-items: center; 
+            margin-top: 25px;
+            margin-bottom: 10px;
+            flex-wrap: wrap; /* Memungkinkan tombol dan input wrap pada layar kecil */
+            gap: 10px; /* Jarak antar item di resiListControl */
+        }
+        
+        #activeResiTitle { 
+            margin: 0; 
+            padding-bottom: 0; 
+            border-bottom: none; 
+            flex-shrink: 0; 
+            margin-right: 10px;
+        }
+        
+        #searchResiInput {
+            flex-grow: 1; 
+            margin-right: 10px; 
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+            max-width: 300px; 
+        }
+        
+        /* NEW STYLE FOR ACTIVE SHEET EXPORT BUTTON */
+        #exportActiveSheetBtn {
+            padding: 8px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            white-space: nowrap;
+            transition: background-color 0.2s;
+        }
+        #exportActiveSheetBtn:hover { background-color: #0056b3; }
+
+        #resiListControl + table { border-top: 1px solid #ddd; }
+
+        #addResiBtn {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        #addResiBtn:hover { background-color: #218838; }
+        
+        #addCancelResiBtn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        #addCancelResiBtn:hover { background-color: #c82333; }
+
+        #alertMessage { padding: 10px; margin-bottom: 15px; border-radius: 4px; display: none; font-weight: bold; }
+        .alert-success { background-color: #d4edda; color: #155724; border-color: #c3e6cb;}
+        .alert-warning { background-color: #fff3cd; color: #856404; border-color: #ffeeba;}
+        .alert-error { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb;}
+
+        .sheet-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            gap: 5px;
+            border-bottom: 1px solid #ccc;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .sheet-tabs button {
+            flex-shrink: 0;
+            padding: 10px 18px;
+            border: none;
+            background-color: transparent;
+            cursor: pointer;
+            font-weight: 600;
+            color: #555;
+            border-radius: 4px 4px 0 0;
+            margin-bottom: -1px;
+            transition: background-color 0.2s, color 0.2s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .sheet-tabs button.active {
+            background-color: #fff;
+            color: #007bff;
+            border: 1px solid #ccc;
+            border-bottom: 3px solid #007bff;
+            border-top-color: #007bff;
+        }
+        
+        #clearSheetBtn {
+            padding: 8px 15px;
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        #clearSheetBtn:hover { background-color: #f5c6cb; }
+        
+        .delete-btn-active {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            padding: 5px 8px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        .delete-btn-active:hover { background: #f5c6cb; }
+
+        /* --- AVA ALERT CSS --- */
+        .ava-alert-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px); 
+            z-index: 99999; opacity: 0; pointer-events: none; transition: opacity 0.4s ease-in-out;
+        }
+        .ava-alert-container.show { opacity: 1; pointer-events: all; }
+        .ava-alert {
+            background: #fff; color: #333; padding: 40px; border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3); max-width: 550px; width: 90%;
+            text-align: center; transform: scale(0.7); transition: transform 0.4s; border: 2px solid #ccc; position: relative;
+        }
+        .ava-alert-container.show .ava-alert { transform: scale(1); }
+        .ava-alert h3 { margin-top: 0; font-size: 2.2rem; color: #dc3545; }
+        .ava-alert.ava-warning h3 { color: #ffc107; }
+        .ava-alert.ava-info h3 { color: #17a2b8; }
+        .ava-alert.ava-success h3 { color: #28a745; }
+        
+        .ava-alert.ava-danger { border-color: #dc3545; }
+        .ava-alert.ava-warning { border-color: #ffc107; }
+        .ava-alert.ava-info { border-color: #17a2b8; }
+        .ava-alert.ava-success { border-color: #28a745; }
+
+        #ava-countdown { display: inline; margin-left: 5px; font-size: 0.9rem; font-weight: 500; }
+        .ava-alert .btn {
+            background: #007bff; color: white; border: none; padding: 12px 25px; 
+            border-radius: 6px; cursor: pointer; margin-top: 25px; font-weight: bold; font-size: 1.1rem;
+        }
+        .ava-alert .btn:hover { background: #0069d9; }
+        .ava-alert.ava-danger .btn { background: #dc3545; }
+        .ava-alert.ava-danger .btn:hover { background: #c82333; }
+
+        .ava-alert .icon { font-size: 5rem; margin-bottom: 10px; color: #dc3545; display: block; }
+        .ava-alert.ava-warning .icon { color: #ffc107; }
+        .ava-alert.ava-info .icon { color: #17a2b8; }
+        .ava-alert.ava-success .icon { color: #28a745; }
+        
+        #avaCloseButton {
+            color: #9ca3af; background-color: transparent; border: none; padding: 6px 10px;
+            border-radius: 8px; cursor: pointer; transition: all 0.2s; position: absolute; top: 8px; right: 8px; z-index: 10;
+        }
+        #avaCloseButton:hover { background-color: #f3f4f6; color: #111827; }
+        
+        .ava-alert .icon-svg { display: block; margin: 0 auto 15px; width: 80px; height: 80px; color: #dc3545; }
+        .ava-alert.ava-warning .icon-svg { color: #ffc107; }
+        .ava-alert.ava-danger .icon-svg { color: #dc3545; }
+
+        .ava-alert .custom-text-content { color: #6b7280; margin-top: 15px; margin-bottom: 25px; font-size: 1.1rem; }
+        .ava-alert .btn-group { display: flex; justify-content: center; gap: 15px; margin-top: 25px; }
+        .ava-custom-btn {
+            font-weight: 500; border-radius: 8px; text-align: center; padding: 10px 20px; font-size: 1rem;
+            cursor: pointer; transition: all 0.2s; display: inline-flex; alignItems: center; justifyContent: center;
+        }
+        .ava-custom-btn-danger { color: white; background-color: #dc3545; border: 1px solid #dc3545; }
+        .ava-custom-btn-danger:hover { background-color: #c82333; border-color: #c82333; }
+
+        /* Toast Styles */
+        .ava-toast-list { position: fixed; z-index: 100000; display: flex; flex-direction: column; gap: 15px; padding: 20px; }
+        .ava-toast-list.top-right { top: 0; right: 0; }
+        .ava-toast {
+            background: #fff; color: #333; padding: 15px 20px; border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); max-width: 350px; min-width: 250px;
+            opacity: 0; transform: translateX(120%); transition: opacity 0.4s, transform 0.5s;
+            position: relative; border-left: 5px solid;
+        }
+        .ava-toast.show { opacity: 1; transform: translateX(0); }
+        .ava-toast-text { font-weight: 600; margin: 0; display: flex; align-items: center; }
+        .ava-toast .icon { font-size: 1.4rem; margin-right: 10px; }
+        .ava-toast .progress-bar { position: absolute; bottom: 0; left: 0; height: 4px; width: 100%; background: rgba(0,0,0,0.05); }
+        .ava-toast .progress { height: 100%; width: 100%; background: #007bff; transition: width linear; }
+
+        .ava-success { border-left-color: #28a745; }
+        .ava-success .icon, .ava-success .progress { color: #28a745; background: #28a745; }
+        .ava-danger { border-left-color: #dc3545; }
+        .ava-danger .icon, .ava-danger .progress { color: #dc3545; background: #dc3545; }
+        .ava-info { border-left-color: #17a2b8; }
+        .ava-info .icon, .ava-info .progress { color: #17a2b8; background: #17a2b8; }
+        .ava-warning { border-left-color: #ffc107; }
+        .ava-warning .icon, .ava-warning .progress { color: #ffc107; background: #ffc107; }
+        
+        /* --- DARK MODE CSS --- */
+        body.dark-mode { background-color: #121212; color: #e0e0e0; }
+        .dark-mode #stickyHeaderContainer { background-color: #121212; box-shadow: 0 4px 5px rgba(0, 0, 0, 0.4); }
+        .dark-mode #watermark { color: #777; background-color: rgba(255, 255, 255, 0.05); }
+        .dark-mode .container, .dark-mode .input-area { background-color: #1e1e1e; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); }
+        .dark-mode #storeName, .dark-mode #realTimeClock { color: #f0f0f0; }
+        .dark-mode #realTimeDate { color: #bbbbbb; }
+        .dark-mode #mainHeader { border-bottom-color: #0099ff; }
+        .dark-mode #newResiInput, .dark-mode #cancelResiInput, .dark-mode #searchResiInput {
+            background-color: #2c2c2c; border-color: #3d3d3d; color: #e0e0e0;
+        }
+        .dark-mode h2 { border-bottom-color: #3d3d3d; }
+        .dark-mode th, .dark-mode td { border-color: #3d3d3d; }
+        .dark-mode th { background-color: #2c2c2c; }
+        .dark-mode .sheet-tabs { border-bottom-color: #3d3d3d; }
+        .dark-mode .sheet-tabs button { color: #bbbbbb; }
+        .dark-mode .sheet-tabs button.active {
+            background-color: #1e1e1e; color: #0099ff; border: 1px solid #3d3d3d; border-bottom: 3px solid #0099ff; border-top-color: #0099ff;
+        }
+        .dark-mode .summary-widget { background-color: #0069d9; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5); }
+        .dark-mode #modeToggleBtn { background-color: #2c2c2c; color: #e0e0e0; }
+        body.dark-mode .ava-alert { background: #1e1e1e; color: #e0e0e0; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6); border-color: #3d3d3d; }
+        body.dark-mode .ava-alert.ava-warning { border-color: #ffc107; }
+        body.dark-mode .ava-toast { background: #1e1e1e; color: #f0f0f0; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); }
+        
+        /* Tambahan styling untuk memastikan ikon memiliki warna yang konsisten */
+        .dark-mode .sheet-tabs button span {
+            color: inherit !important; /* Menggunakan warna teks tombol untuk ikon saat Dark Mode */
+        }
+        .dark-mode #exportActiveSheetBtn { background-color: #0099ff; }
+        .dark-mode #exportActiveSheetBtn:hover { background-color: #0077cc; }
+
+
+        .icon-success:before { content: '✓'; }
+        .icon-danger:before { content: '✕'; }
+        .icon-info:before { content: 'i'; }
+        .icon-warning:before { content: '!'; }
+    </style>
+</head>
+<body>
+    
+    <audio id="scannerBeep" src="scanning-item2.m4a" preload="auto"></audio>
+    <audio id="errorBeep" src="buzzer-error.mp3" preload="auto"></audio>
+    <audio id="warningBeep" src="warning-sound.mp3" preload="auto"></audio>
+
+    <div id="stickyHeaderContainer">
+        <div id="watermark">Design By Galih Singgih</div>
+
+        <div class="container">
+            <div id="mainHeader">
+                <button id="modeToggleBtn" style="padding: 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; position: absolute; top: 10px; left: 20px; background-color: #f8f9fa; color: #333; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    ☀️ Light Mode
+                </button>
+                <h1 id="storeName">Cozyclub.id</h1>
+                
+                <div id="datetimeInfo">
+                    <div id="realTimeDate">Hari, Tanggal Bulan Tahun</div>
+                    <div id="realTimeClock">00:00:00</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="content-container">
+        
+        <div class="summary-widget">
+            
+            <div id="currentSheetStats">
+                <h3>TOTAL PAKET <br> <span id="activeSheetName">Otomatis</span></h3>
+                <div id="totalPackages" class="total-number">0</div>
+                <p>paket di lembar kerja aktif</p>
+                <hr style="border-color: rgba(255,255,255,0.3); margin: 20px 0;">
+            </div>
+            
+            <div>
+                <h3 style="margin-bottom: 5px;">TOTAL KESELURUHAN <br> (Semua Kurir)</h3>
+                <div id="totalOverallPackages" class="total-number">0</div>
+            </div>
+            
+            <div style="width: 100%; padding-top: 10px;">
+                <button id="exportBtn">
+                    💾 Export Semua Data (CSV)
+                </button>
+                
+                <input type="file" id="importFileInput" accept=".csv">
+                <button id="importBtn">
+                    📂 Import Data (CSV)
+                </button>
+                
+                <button id="resetAllBtn">
+                    🚨 Hapus SEMUA Data (Global Reset)
+                </button>
+            </div>
+        </div>
+
+        <div class="input-area">
+            
+            <div class="sheet-tabs" id="sheetTabs"></div>
+
+            <h2>Input Resi Baru</h2>
+            <div id="alertMessage"></div>
+            <div id="inputGroup">
+                <input type="text" id="newResiInput" placeholder="Pindai atau Masukkan Nomor Resi..." autofocus>
+                <button id="addResiBtn">Tambahkan</button>
+            </div>
+            
+            <div id="cancelSection" style="margin-bottom: 20px; border-top: 1px solid #ddd; padding-top: 15px;">
+                <label for="cancelResiInput" style="font-weight: bold; display: block; margin-bottom: 5px; color: #dc3545;">❌ Input Resi Dibatalkan / Cancel:</label>
+                <div id="cancelGroup" style="display: flex; gap: 10px;">
+                    <input type="text" id="cancelResiInput" placeholder="Pindai Resi yang Dibatalkan...">
+                    <button id="addCancelResiBtn">Catat Cancel</button>
+                </div>
+            </div>
+
+            <div id="resiListControl">
+                <h2 id="activeResiTitle">Daftar Resi Aktif</h2>
+                <input type="text" id="searchResiInput" placeholder="Cari Resi di sheet aktif...">
+                <button id="exportActiveSheetBtn" style="display: none;">💾 Export Sheet Aktif (CSV)</button> <button id="clearSheetBtn">Hapus Semua Resi di Sheet Aktif</button>
+            </div>
+            <table id="activeResiTable">
+                <thead id="activeResiThead" style="display: none;">
+                    <tr>
+                        <th style="width: 5%;">No</th>
+                        <th>Nomor Resi</th>
+                        <th style="width: 10%;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="resiList">
+                    </tbody>
+            </table>
+            
+            <h2 id="cancelledResiTitle" style="color: #dc3545; border-color: #dc3545; margin-top: 40px; display: none;">Daftar Resi Dibatalkan</h2>
+            <table id="cancelledResiTable" style="display: none;">
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">No</th>
+                        <th>Nomor Resi Cancel</th>
+                        <th style="width: 10%;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="cancelledResiList">
+                    </tbody>
+            </table>
+
+        </div>
+    </div>
+
+    <script>
+        
+        // --- AVA ALERT JAVASCRIPT CODE ---
+        function ava({ icon='success', text='Alert!', toast=false, progressBar=true, timer=4000, btnText='OK', position='top-right' }) {
+            if (toast) {
+                let list = document.querySelector(`.ava-toast-list.${position}`);
+                if (!list) {
+                    list = document.createElement('div'); list.className = `ava-toast-list ${position}`; document.body.appendChild(list);
+                }
+                const toastDiv = document.createElement('div'); toastDiv.className = `ava-toast ava-${icon}`;
+                let iconClass = `icon-${icon}`; if (icon === 'none') iconClass = '';
+                toastDiv.innerHTML = `<p class="ava-toast-text"><span class="icon ${iconClass}"></span>${text}</p>${progressBar ? '<div class="progress-bar"><div class="progress"></div></div>' : ''}`;
+                list.appendChild(toastDiv);
+                setTimeout(() => { toastDiv.classList.add('show'); }, 10);
+                if (progressBar) {
+                    const progress = toastDiv.querySelector('.progress');
+                    progress.style.transitionDuration = `${timer / 1000}s`;
+                    progress.style.width = '0%';
+                }
+                setTimeout(() => {
+                    toastDiv.classList.remove('show');
+                    setTimeout(() => { list.removeChild(toastDiv); if (list.children.length === 0) list.remove(); }, 400);
+                }, timer);
+            } else {
+                const container = document.createElement('div'); container.className = 'ava-alert-container';
+                const alertDiv = document.createElement('div'); alertDiv.className = `ava-alert ava-${icon}`;
+                let btn = null;
+                const closePopup = () => {
+                    clearInterval(countdownInterval);
+                    container.classList.remove('show');
+                    setTimeout(() => { document.body.removeChild(container); document.removeEventListener('keydown', handleKeyClose); const newResiInput = document.getElementById('newResiInput'); if(newResiInput) newResiInput.focus(); }, 300);
+                };
+                const handleKeyClose = (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') { 
+                        if(document.activeElement === btn || document.activeElement === document.getElementById('avaConfirmButton')) {
+                            e.preventDefault(); closePopup();
+                        }
+                    }
+                };
+                let countdownInterval;
+                
+                if (icon === 'warning' || icon === 'danger') {
+                    let svgIconPath = ''; let svgColorClass = 'text-red-600'; 
+                    if (icon === 'warning') {
+                        svgIconPath = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>`;
+                        svgColorClass = 'text-yellow-500';
+                    } else if (icon === 'danger') {
+                        svgIconPath = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>`;
+                        svgColorClass = 'text-red-600'; 
+                    }
+                    const customSvg = `<svg class="icon-svg ${svgColorClass}" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">${svgIconPath}</svg>`;
+                    alertDiv.innerHTML = `<div style="position: absolute; top: 0; right: 0;"><button type="button" id="avaCloseButton">✕</button></div><div class="custom-content-wrapper p-6 pt-0 text-center">${customSvg}<h3 class="main-title text-xl font-normal text-gray-500 mt-5 mb-6"></h3><div class="custom-text-content">${text}</div><div class="btn-group"><a href="#" id="avaConfirmButton" class="ava-custom-btn ava-custom-btn-danger" style="margin: 0; padding: 12px 25px;">${btnText} <span id="ava-countdown"></span></a></div></div>`;
+                    
+                    const mainTitleElement = alertDiv.querySelector('.main-title');
+                    const tempDiv = document.createElement('div'); tempDiv.innerHTML = text;
+                    const mainTitleSpan = tempDiv.querySelector('span:first-child');
+                    if (mainTitleSpan) {
+                         mainTitleElement.innerHTML = mainTitleSpan.innerHTML; mainTitleSpan.remove();
+                         alertDiv.querySelector('.custom-text-content').innerHTML = tempDiv.innerHTML;
+                    } else {
+                         mainTitleElement.style.display = 'none'; alertDiv.querySelector('.custom-text-content').innerHTML = text;
+                    }
+                    const closeBtn = document.getElementById('avaCloseButton'); if (closeBtn) closeBtn.onclick = closePopup;
+                    btn = document.getElementById('avaConfirmButton'); if (btn) btn.onclick = closePopup;
+                    setTimeout(() => { container.classList.add('show'); if (btn) btn.focus(); }, 10);
+                } else {
+                    let iconChar = ''; if (icon === 'success') iconChar = '✓'; else if (icon === 'info') iconChar = 'i';
+                    alertDiv.innerHTML = `<div class="icon">${iconChar}</div><h3>${text}</h3><button class="btn">${btnText} <span id="ava-countdown"></span></button>`;
+                    btn = alertDiv.querySelector('.btn');
+                    setTimeout(() => { container.classList.add('show'); btn.focus(); }, 10);
+                    btn.onclick = closePopup;
+                }
+                container.appendChild(alertDiv); document.body.appendChild(container);
+                const countdownSpan = document.getElementById('ava-countdown');
+                if (timer > 0 && countdownSpan) {
+                     let timeLeft = timer / 1000; countdownSpan.textContent = `(${timeLeft})`; 
+                     countdownInterval = setInterval(() => {
+                         timeLeft--; countdownSpan.textContent = `(${timeLeft})`;
+                         if (timeLeft <= 0) { closePopup(); }
+                     }, 1000);
+                } else if (countdownSpan) { countdownSpan.textContent = ''; }
+            }
+        }
+        
+        function playBeepSound() { document.getElementById('scannerBeep').currentTime=0; document.getElementById('scannerBeep').play().catch(e=>{}); }
+        function playErrorSound() { document.getElementById('errorBeep').currentTime=0; document.getElementById('errorBeep').play().catch(e=>{}); }
+        function playWarningSound() { document.getElementById('warningBeep').currentTime=0; document.getElementById('warningBeep').play().catch(e=>{}); }
+
+        // --- DATA DAN STATE ---
+        const SHEET_NAMES = ['Otomatis', 'Shopee', 'JNT', 'JNE', 'Lazada', 'Sicepat', 'Ninja', 'GTL'];
+        const STORAGE_KEY = 'resiScannerData';
+        let allPackages = {};
+        let activeSheet = SHEET_NAMES[0];
+        const COURIER_PREFIXES = {
+            'Shopee': ['SPXID05', 'SPXID0'],
+            'JNT': ['JX62', 'TKP50', 'JP', 'JX', 'MANUAL'],
+            'JNE': ['CM', 'JY', 'TG', 'CN'],
+            'GTL': ['GTL'],
+            'Sicepat': ['00', 'SC'], 
+            'Lazada': ['LXAD', 'JNAP', 'JZ'], 
+            'Ninja': ['NJAT', 'NJVTT'],
+        };
+        
+        // Mapping Visual Tab (Ikon/Emoji dan Warna) - TIDAK DIGUNAKAN UNTUK TAB DISPLAY LAGI
+        const SHEET_VISUALS = {
+            'Otomatis': { icon: '⚡', color: '#007bff' },
+            'Shopee': { icon: '🧡', color: '#ff6600' }, // Orange
+            'JNT': { icon: '💚', color: '#28a745' }, // Green
+            'JNE': { icon: '💖', color: '#dc3545' }, // Red/Pink
+            'Lazada': { icon: '💙', color: '#17a2b8' }, // Cyan/Blue
+            'Sicepat': { icon: '💛', color: '#ffc107' }, // Yellow
+            'Ninja': { icon: '💜', color: '#6f42c1' }, // Purple
+            'GTL': { icon: '⚡', color: '#009933' }, // Dark Green/GTL color
+        };
+
+        // --- ELEMEN DOM ---
+        const resiList = document.getElementById('resiList');
+        const totalPackagesDisplay = document.getElementById('totalPackages');
+        const totalOverallPackages = document.getElementById('totalOverallPackages');
+        const newResiInput = document.getElementById('newResiInput');
+        const sheetTabsContainer = document.getElementById('sheetTabs');
+        const activeSheetNameDisplay = document.getElementById('activeSheetName');
+        const exportBtn = document.getElementById('exportBtn');
+        const importBtn = document.getElementById('importBtn');
+        const importFileInput = document.getElementById('importFileInput');
+        const resetAllBtn = document.getElementById('resetAllBtn');
+        const clearSheetBtn = document.getElementById('clearSheetBtn');
+        const searchResiInput = document.getElementById('searchResiInput');
+        const realTimeClock = document.getElementById('realTimeClock');
+        const realTimeDate = document.getElementById('realTimeDate');
+        const cancelResiInput = document.getElementById('cancelResiInput');
+        const cancelledResiList = document.getElementById('cancelledResiList');
+        
+        const activeResiThead = document.getElementById('activeResiThead');
+        const cancelledResiTitle = document.getElementById('cancelledResiTitle');
+        const cancelledResiTable = document.getElementById('cancelledResiTable');
+        const resiListControl = document.getElementById('resiListControl');
+        
+        // ELEMEN BARU
+        const exportActiveSheetBtn = document.getElementById('exportActiveSheetBtn'); 
+
+        // Dark Mode Logic
+        const MODE_STORAGE_KEY = 'cozyclubDarkMode';
+        const modeToggleBtn = document.getElementById('modeToggleBtn');
+
+        function setDarkMode(isDark) {
+            if (isDark) {
+                document.body.classList.add('dark-mode');
+                modeToggleBtn.innerHTML = '🌙 Dark Mode';
+                localStorage.setItem(MODE_STORAGE_KEY, 'dark');
+            } else {
+                document.body.classList.remove('dark-mode');
+                modeToggleBtn.innerHTML = '☀️ Light Mode';
+                localStorage.setItem(MODE_STORAGE_KEY, 'light');
+            }
+        }
+        function toggleDarkMode() { const isDark = document.body.classList.contains('dark-mode'); setDarkMode(!isDark); }
+        function loadUserModePreference() {
+            const savedMode = localStorage.getItem(MODE_STORAGE_KEY);
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (savedMode === 'dark') setDarkMode(true);
+            else if (savedMode === 'light') setDarkMode(false);
+            else setDarkMode(prefersDark);
+        }
+
+        // --- FUNGSI UMUM ---
+        function updateClock() {
+            const now = new Date();
+            realTimeClock.textContent = now.toLocaleTimeString('id-ID');
+            realTimeDate.textContent = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        }
+
+        function initializeData() {
+            allPackages = {};
+            SHEET_NAMES.forEach(name => {
+                if (name !== 'Otomatis') allPackages[name] = { activeResis: [], cancelledResis: [] };
+            });
+             if (!allPackages['Otomatis']) allPackages['Otomatis'] = { activeResis: [], cancelledResis: [] };
+        }
+
+        function saveData() { const dataToStore = { ...allPackages }; delete dataToStore.Otomatis; localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToStore)); }
+        function loadData() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            initializeData();
+            if (data) {
+                try {
+                    const loadedData = JSON.parse(data);
+                    for (const sheetName of SHEET_NAMES.filter(name => name !== 'Otomatis')) {
+                        const loadedSheetData = loadedData[sheetName];
+                        if (loadedSheetData) {
+                            if (Array.isArray(loadedSheetData)) { allPackages[sheetName].activeResis = loadedSheetData; } 
+                            else if (typeof loadedSheetData === 'object' && loadedSheetData.activeResis) { Object.assign(allPackages[sheetName], loadedSheetData); }
+                        }
+                    }
+                } catch (e) { console.error(e); }
+            }
+        }
+
+        function validateResiPrefix(resi, sheetName) {
+            const prefixes = COURIER_PREFIXES[sheetName];
+            const match = prefixes && prefixes.some(prefix => resi.toUpperCase().startsWith(prefix.toUpperCase()));
+            if (match) return { isValid: true, suggestedSheet: sheetName };
+            
+            let suggestedSheet = null;
+            for (const key in COURIER_PREFIXES) {
+                if (COURIER_PREFIXES[key].some(prefix => resi.toUpperCase().startsWith(prefix.toUpperCase()))) {
+                    suggestedSheet = key; break;
+                }
+            }
+            return { isValid: false, suggestedSheet: suggestedSheet };
+        }
+
+        function calculateOverallTotal() {
+            let overallTotal = 0;
+            SHEET_NAMES.filter(name => name !== 'Otomatis').forEach(sheetName => {
+                const data = allPackages[sheetName];
+                if (data) { overallTotal += data.activeResis.length + data.cancelledResis.length; }
+            });
+            return overallTotal;
+        }
+
+        function showAlert(message, type = 'warning') {
+            const alertMessage = document.getElementById('alertMessage');
+            alertMessage.innerHTML = message; alertMessage.className = ''; alertMessage.classList.add(`alert-${type}`);
+            alertMessage.style.display = 'block'; setTimeout(() => { alertMessage.style.display = 'none'; }, 3000);
+        }
+
+        function updateDisplay() {
+            const isAutomaticMode = activeSheet === 'Otomatis';
+            
+            // --- KONTROL VISIBILITAS WIDGET (SESUAI REQUEST GAMBAR) ---
+            const currentSheetStats = document.getElementById('currentSheetStats');
+            const cancelSection = document.getElementById('cancelSection');
+
+            if (isAutomaticMode) {
+                // DI TAB OTOMATIS: Sembunyikan bagian "Total Paket per Sheet"
+                if (currentSheetStats) currentSheetStats.style.display = 'none';
+                if (cancelSection) cancelSection.style.display = 'none';
+            } else {
+                // DI TAB LAIN: Tampilkan semua
+                if (currentSheetStats) currentSheetStats.style.display = 'block';
+                if (cancelSection) cancelSection.style.display = 'block';
+            }
+            // --------------------------------------------------------
+
+            resiListControl.style.display = isAutomaticMode ? 'none' : 'flex';
+            activeResiThead.style.display = isAutomaticMode ? 'none' : 'table-header-group'; 
+            cancelledResiTitle.style.display = isAutomaticMode ? 'none' : 'block';
+            cancelledResiTable.style.display = isAutomaticMode ? 'none' : 'table';
+            
+            // Kontrol visibility tombol export sheet aktif
+            if (exportActiveSheetBtn) {
+                exportActiveSheetBtn.style.display = isAutomaticMode ? 'none' : 'block';
+            }
+            
+            const data = allPackages[activeSheet]; 
+            const currentActiveResis = data && !isAutomaticMode ? data.activeResis : [];
+            const currentCancelledResis = data && !isAutomaticMode ? data.cancelledResis : [];
+            const searchTerm = searchResiInput.value.trim().toUpperCase();
+            
+            totalPackagesDisplay.textContent = isAutomaticMode ? '0' : currentActiveResis.length;
+            activeSheetNameDisplay.textContent = activeSheet;
+            totalOverallPackages.textContent = calculateOverallTotal();
+
+            resiList.innerHTML = '';
+            const listPlaceholder = (text, targetList, isAutomatic = false) => {
+                const row = targetList.insertRow(); const cell = row.insertCell(0); cell.colSpan = 3; 
+                cell.textContent = text; cell.style.textAlign = 'center'; cell.style.fontStyle = 'italic';
+                if(isAutomatic) {
+                    cell.style.fontWeight = 'bold'; cell.style.padding = '30px'; 
+                    cell.style.color = document.body.classList.contains('dark-mode') ? '#0099ff' : '#007bff';
+                    cell.style.fontSize = '1.1rem'; cell.style.lineHeight = '1.5'; 
+                }
+            }
+
+            if (isAutomaticMode) {
+                const automaticModeText = "Mode Otomatis Aktif. Resi akan disortir otomatis ke Kurir yang sesuai.";
+                listPlaceholder(automaticModeText, resiList, true);
+                cancelledResiList.innerHTML = ''; 
+            } else {
+                const filteredResis = searchTerm ? currentActiveResis.filter(resi => resi.toUpperCase().includes(searchTerm)) : currentActiveResis;
+                if (currentActiveResis.length === 0) { listPlaceholder(`Belum ada resi aktif untuk ${activeSheet}.`, resiList); } 
+                else if (filteredResis.length === 0 && searchTerm) { listPlaceholder(`Nomor resi dengan kata kunci "${searchTerm}" tidak ditemukan.`, resiList); } 
+                else {
+                    [...filteredResis].reverse().forEach((resi, index) => {
+                        const row = resiList.insertRow(0); 
+                        const cellNo = row.insertCell(0); const cellResi = row.insertCell(1); const cellAction = row.insertCell(2);
+                        cellNo.textContent = currentActiveResis.indexOf(resi) + 1; cellResi.textContent = resi;
+                        const deleteBtn = document.createElement('button'); deleteBtn.textContent = 'X'; deleteBtn.classList.add('delete-btn-active');
+                        deleteBtn.onclick = () => deleteActiveResi(resi); cellAction.appendChild(deleteBtn); cellAction.style.textAlign = 'center';
+                    });
+                }
+                cancelledResiList.innerHTML = '';
+                if (currentCancelledResis.length > 0) {
+                    [...currentCancelledResis].reverse().forEach((resi, index) => {
+                        const row = cancelledResiList.insertRow(0); 
+                        const cellNo = row.insertCell(0); const cellResi = row.insertCell(1); const cellAction = row.insertCell(2);
+                        cellNo.textContent = currentCancelledResis.length - index; cellResi.textContent = resi;
+                        const deleteBtn = document.createElement('button'); deleteBtn.textContent = 'X';
+                        deleteBtn.style.cssText = 'background: #dc3545; color: white; border: none; padding: 5px 8px; cursor: pointer; border-radius: 4px; font-weight: bold;';
+                        deleteBtn.onclick = () => deleteCancelledResi(resi); cellAction.appendChild(deleteBtn); cellAction.style.textAlign = 'center';
+                    });
+                }
+            }
+        }
+
+        function createSheetTabs() {
+            sheetTabsContainer.innerHTML = '';
+            SHEET_NAMES.forEach((name) => {
+                const button = document.createElement('button');
+                let count = 0; 
+                if(name !== 'Otomatis' && allPackages[name]) { 
+                    count = allPackages[name].activeResis.length; 
+                }
+
+                // HILANGKAN IKON/EMOJI dan warna spesifik kurir.
+                const tabContent = name === 'Otomatis' ? 'Otomatis' : `${name} (${count})`;
+                
+                button.innerHTML = tabContent;
+                button.dataset.sheet = name;
+                if (name === activeSheet) { button.classList.add('active'); }
+                button.addEventListener('click', () => switchSheet(name));
+                sheetTabsContainer.appendChild(button);
+            });
+        }
+
+        function switchSheet(sheetName) {
+            activeSheet = sheetName; searchResiInput.value = ''; createSheetTabs(); updateDisplay(); newResiInput.focus();
+        }
+
+        function removeResiFromAllActiveSheets(resi) {
+            let wasRemoved = false;
+            SHEET_NAMES.filter(name => name !== 'Otomatis').forEach(sheetName => {
+                const data = allPackages[sheetName];
+                if (data) {
+                    const initialLength = data.activeResis.length;
+                    data.activeResis = data.activeResis.filter(r => r !== resi);
+                    if (data.activeResis.length < initialLength) { wasRemoved = true; }
+                }
+            });
+            return wasRemoved;
+        }
+
+        function checkGlobalCancelled(resi) {
+            for (const sheetName of SHEET_NAMES.filter(name => name !== 'Otomatis')) {
+                if (allPackages[sheetName] && allPackages[sheetName].cancelledResis.includes(resi)) { return sheetName; }
+            }
+            return null;
+        }
+
+        function addResi(type = 'active') {
+            const inputElement = (type === 'active') ? newResiInput : cancelResiInput;
+            const isCancel = (type === 'cancelled');
+            let resi = inputElement.value.trim().toUpperCase();
+            inputElement.value = '';
+            if (resi === "") { showAlert("Nomor resi tidak boleh kosong!", 'error'); inputElement.focus(); playErrorSound(); return; }
+            if (resi.length < 10) { showAlert("Resi terlalu pendek.", 'error'); inputElement.focus(); playErrorSound(); return; }
+             if (isCancel && activeSheet === 'Otomatis') {
+                 showAlert(`❌ Tidak bisa mencatat Cancel di tab Otomatis. Pindah ke tab kurir spesifik.`, 'error');
+                 cancelResiInput.focus(); playErrorSound(); return;
+             }
+            const cancelledBySheet = checkGlobalCancelled(resi);
+            if (cancelledBySheet) {
+                playWarningSound();
+                const wasRemovedFromActive = removeResiFromAllActiveSheets(resi);
+                saveData(); updateDisplay(); createSheetTabs();
+                ava({ icon: 'danger', text: `<span style="font-size: 2.5rem; display: block; margin-bottom: 10px; font-weight: bold;">⚠️ PAKET CANCEL DITEMUKAN!</span><br>Nomor Resi: <strong>${resi}</strong><br>Dibatalkan di Kurir: <strong>${cancelledBySheet}</strong>`, btnText: 'SAYA MENGERTI', toast: false, timer: 10000 });
+                return; 
+            }
+
+            if (!isCancel) {
+                if (activeSheet === 'Otomatis') {
+                     let suggestedSheet = null;
+                     for (const key in COURIER_PREFIXES) {
+                         if (COURIER_PREFIXES[key].some(prefix => resi.toUpperCase().startsWith(prefix.toUpperCase()))) { suggestedSheet = key; break; }
+                     }
+                     if (suggestedSheet) {
+                         const activeList = allPackages[suggestedSheet].activeResis;
+                         if (activeList.includes(resi)) { showAlert(`❌ Resi ${resi} sudah ada di ${suggestedSheet}!`, 'error'); newResiInput.focus(); playErrorSound(); return; }
+                         allPackages[suggestedSheet].activeResis.push(resi);
+                         saveData(); createSheetTabs(); updateDisplay(); playBeepSound(); 
+                         ava({ icon: 'success', text: `✅ Resi ${resi} otomatis disortir ke ${suggestedSheet}.`, toast: true, timer: 3000 });
+                     } else {
+                         ava({ icon: 'warning', text: `Resi ${resi} tidak dikenali prefix kurirnya.`, toast: true, timer: 5000 }); playErrorSound();
+                     }
+                     newResiInput.focus(); return;
+                } else {
+                    const activeList = allPackages[activeSheet].activeResis;
+                    if (activeList.includes(resi)) { showAlert(`❌ Resi ${resi} SUDAH ADA!`, 'error'); newResiInput.focus(); playErrorSound(); return; }
+                    const validation = validateResiPrefix(resi, activeSheet);
+                    if (!validation.isValid) {
+                        let suggestedText = "Prefix tidak dikenali.";
+                        if (validation.suggestedSheet) { suggestedText = `Cocok dengan kurir: <strong>${validation.suggestedSheet}</strong>.`; }
+                        ava({ icon: 'warning', text: `<span style="font-size: 2.5rem; display: block; margin-bottom: 10px; font-weight: bold;">❌ RESI TIDAK COCOK!</span>Resi: <strong>${resi}</strong><br>${suggestedText}`, btnText: 'SAYA MENGERTI', toast: false, timer: 8000 });
+                        playErrorSound(); newResiInput.focus(); return; 
+                    }
+                    allPackages[activeSheet].activeResis.push(resi);
+                    showAlert(`✅ Resi ${resi} BERHASIL ditambahkan ke ${activeSheet}.`, 'success'); playBeepSound(); 
+                }
+            } else if (isCancel) {
+                const cancelledList = allPackages[activeSheet].cancelledResis;
+                if (cancelledList.includes(resi)) { showAlert(`❌ Resi Cancel sudah ada!`, 'error'); cancelResiInput.focus(); playErrorSound(); return; }
+                const wasRemovedFromActive = removeResiFromAllActiveSheets(resi);
+                allPackages[activeSheet].cancelledResis.push(resi);
+                showAlert(`✅ Resi Cancel ${resi} BERHASIL dicatat.`, 'success'); playWarningSound(); 
+            }
+            saveData(); updateDisplay(); createSheetTabs(); inputElement.focus();
+        }
+
+        function deleteActiveResi(resi) {
+            const data = allPackages[activeSheet]; data.activeResis = data.activeResis.filter(r => r !== resi);
+            saveData(); updateDisplay(); createSheetTabs(); ava({ icon: 'danger', text: `Resi ${resi} dihapus.`, toast: true });
+        }
+        function deleteCancelledResi(resi) {
+            const data = allPackages[activeSheet]; data.cancelledResis = data.cancelledResis.filter(r => r !== resi);
+            saveData(); updateDisplay(); createSheetTabs(); ava({ icon: 'danger', text: `Resi batal ${resi} dihapus.`, toast: true });
+        }
+        
+        // FUNGSI EXPORT YANG DIMODIFIKASI UNTUK DAPAT MENERIMA ARRAY SHEETS
+        function exportDataToExcel(sheetsToExport = []) {
+            ava({ icon: 'info', text: 'Mempersiapkan data ekspor...', toast: true });
+            const now = new Date(); const scanDate = now.toISOString().slice(0, 10); 
+            let csvContent = "Kurir,Tipe,Nomor Resi,Tanggal Scan\n";
+
+            // Tentukan sheet mana yang akan diekspor (semua jika array kosong)
+            const sheets = sheetsToExport.length > 0 
+                ? sheetsToExport 
+                : SHEET_NAMES.filter(name => name !== 'Otomatis'); 
+
+            sheets.forEach(sheetName => {
+                const data = allPackages[sheetName];
+                if (data) {
+                    data.activeResis.forEach(resi => { csvContent += `${sheetName},AKTIF,${resi},${scanDate}\n`; });
+                    data.cancelledResis.forEach(resi => { csvContent += `${sheetName},BATAL,${resi},${scanDate}\n`; });
+                }
+            });
+            
+            if (csvContent.split('\n').length <= 1) {
+                ava({ icon: 'warning', text: 'Tidak ada data untuk diekspor.', toast: true });
+                return;
+            }
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a"); link.setAttribute("href", url);
+            
+            // Tentukan nama file
+            const filename = sheetsToExport.length === 1 
+                ? `${sheetsToExport[0]}_Resi_${scanDate}.csv` 
+                : `Cozyclub_Resi_${scanDate}_ALL.csv`;
+
+            link.setAttribute("download", filename);
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            ava({ icon: 'success', text: `Data berhasil diekspor.`, toast: true });
+        }
+        
+        // FUNGSI BARU UNTUK EXPORT SHEET AKTIF
+        function exportActiveSheetData() {
+            if (activeSheet === 'Otomatis') {
+                 ava({ icon: 'error', text: 'Tidak bisa export dari tab Otomatis!', toast: true });
+                 return;
+            }
+            exportDataToExcel([activeSheet]);
+        }
+
+
+        function importData(event) {
+            const file = event.target.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                const lines = content.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+                if (lines.length <= 1) { ava({ icon: 'danger', text: 'File kosong/salah.', toast: true }); importFileInput.value = ''; return; }
+                let importedCount = 0; 
+                const newPackages = {}; SHEET_NAMES.filter(name => name !== 'Otomatis').forEach(name => newPackages[name] = { activeResis: [], cancelledResis: [] });
+                for (let i = 1; i < lines.length; i++) {
+                    const parts = lines[i].split(','); if (parts.length < 3) continue; 
+                    const kurir = parts[0].trim(); const tipe = parts[1] ? parts[1].trim().toUpperCase() : 'AKTIF'; const resi = parts[2].trim().toUpperCase();
+                    if (!SHEET_NAMES.includes(kurir) || kurir === 'Otomatis') continue; 
+                    if (allPackages[kurir].activeResis.includes(resi) || allPackages[kurir].cancelledResis.includes(resi)) continue;
+                    if (tipe === 'BATAL') newPackages[kurir].cancelledResis.push(resi); else newPackages[kurir].activeResis.push(resi);
+                    importedCount++;
+                }
+                SHEET_NAMES.filter(name => name !== 'Otomatis').forEach(sheetName => {
+                    allPackages[sheetName].activeResis.push(...newPackages[sheetName].activeResis);
+                    allPackages[sheetName].cancelledResis.push(...newPackages[sheetName].cancelledResis);
+                });
+                saveData(); updateDisplay(); createSheetTabs();
+                ava({ icon: 'success', text: `Import Selesai! ${importedCount} resi baru.`, toast: true, timer: 6000 });
+            };
+            reader.readAsText(file); importFileInput.value = '';
+        }
+
+        function clearActiveSheet() {
+            if (activeSheet === 'Otomatis') return;
+            ava({
+                icon: 'warning', text: `<span style="font-size: 2.5rem; display: block; margin-bottom: 10px; font-weight: bold;">HAPUS SHEET AKTIF?</span>`,
+                btnText: 'YA, HAPUS SEKARANG'
+            });
+            document.getElementById('avaConfirmButton').onclick = () => {
+                allPackages[activeSheet].activeResis = []; allPackages[activeSheet].cancelledResis = [];
+                saveData(); updateDisplay(); createSheetTabs();
+                const container = document.querySelector('.ava-alert-container'); container.classList.remove('show'); setTimeout(() => { document.body.removeChild(container); }, 300);
+                ava({ icon: 'success', text: `Data sheet dihapus.`, toast: true });
+            };
+        }
+
+        function resetAllData() {
+            ava({
+                icon: 'danger', text: `<span style="font-size: 2.5rem; display: block; margin-bottom: 10px; font-weight: bold;">RESET TOTAL?</span>`,
+                btnText: 'YA, RESET TOTAL'
+            });
+            document.getElementById('avaConfirmButton').onclick = () => {
+                localStorage.removeItem(STORAGE_KEY); loadData(); updateDisplay(); createSheetTabs();
+                const container = document.querySelector('.ava-alert-container'); container.classList.remove('show'); setTimeout(() => { document.body.removeChild(container); }, 300);
+                ava({ icon: 'success', text: 'Semua data dihapus.', toast: true });
+            };
+        }
+
+        function handleShortcut(event) {
+            if (document.querySelector('.ava-alert-container.show')) return; 
+            const isShiftKey = event.shiftKey; const sheetIndex = parseInt(event.key) - 1; 
+            if (isShiftKey && sheetIndex >= 0 && sheetIndex < SHEET_NAMES.length) {
+                if (document.activeElement.tagName !== 'INPUT') {
+                    event.preventDefault(); switchSheet(SHEET_NAMES[sheetIndex]);
+                    ava({ icon: 'info', text: `Pindah ke: **${SHEET_NAMES[sheetIndex]}**`, toast: true, timer: 2000 });
+                }
+            } 
+        }
+
+        document.getElementById('addResiBtn').addEventListener('click', () => addResi('active'));
+        document.getElementById('newResiInput').addEventListener('keyup', (e) => { if (e.key === 'Enter') addResi('active'); });
+        document.getElementById('addCancelResiBtn').addEventListener('click', () => addResi('cancelled'));
+        document.getElementById('cancelResiInput').addEventListener('keyup', (e) => { if (e.key === 'Enter') addResi('cancelled'); });
+        
+        // Panggilan fungsi exportDataToExcel tanpa argumen akan mengekspor SEMUA data
+        exportBtn.addEventListener('click', () => exportDataToExcel());
+        // Event listener untuk tombol export sheet aktif yang baru
+        exportActiveSheetBtn.addEventListener('click', exportActiveSheetData);
+
+        importBtn.addEventListener('click', () => importFileInput.click());
+        importFileInput.addEventListener('change', importData);
+        resetAllBtn.addEventListener('click', resetAllData);
+        clearSheetBtn.addEventListener('click', clearActiveSheet);
+        searchResiInput.addEventListener('keyup', updateDisplay);
+        document.addEventListener('keydown', handleShortcut);
+        modeToggleBtn.addEventListener('click', toggleDarkMode);
+
+        loadUserModePreference(); loadData(); createSheetTabs(); updateDisplay(); setInterval(updateClock, 1000); newResiInput.focus();
+    </script>
+</body>
+</html>
